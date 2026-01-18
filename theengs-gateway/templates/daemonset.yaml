@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "theengs-gateway.fullname" . }}
+  namespace: {{ include "theengs-gateway.namespace" . }}
+  labels:
+    {{- include "theengs-gateway.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "theengs-gateway.selectorLabels" . | nindent 6 }}
+  updateStrategy:
+    type: {{ .Values.updateStrategy.type }}
+    {{- if eq .Values.updateStrategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.updateStrategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "theengs-gateway.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ble-mqtt-bridge
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      # Node selector for Bluetooth-enabled nodes
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # Use host network for Bluetooth access
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          # Environment variables from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: {{ include "theengs-gateway.fullname" . }}-config
+            {{- if or .Values.mqtt.username .Values.mqtt.password .Values.mqtt.existingSecret }}
+            - secretRef:
+                name: {{ include "theengs-gateway.secretName" . }}
+            {{- end }}
+
+          # Security context for Bluetooth access
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+
+          # Volume mounts for D-Bus (BlueZ communication)
+          volumeMounts:
+            - name: dbus
+              mountPath: /var/run/dbus
+              readOnly: false
+            - name: bluetooth
+              mountPath: /var/lib/bluetooth
+              readOnly: true
+
+          # Resources
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          {{- if .Values.livenessProbe.enabled }}
+          # Liveness probe - check if process is running
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - -f
+                - TheengsGateway
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+
+      volumes:
+        - name: dbus
+          hostPath:
+            path: /var/run/dbus
+            type: Directory
+        - name: bluetooth
+          hostPath:
+            path: /var/lib/bluetooth
+            type: DirectoryOrCreate
+
+      # Tolerations
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # Restart policy
+      restartPolicy: Always
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 10

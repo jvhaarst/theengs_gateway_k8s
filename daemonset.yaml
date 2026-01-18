@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: theengs-gateway
+  namespace: theengs
+  labels:
+    app.kubernetes.io/name: theengs-gateway
+    app.kubernetes.io/component: ble-mqtt-bridge
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: theengs-gateway
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: theengs-gateway
+        app.kubernetes.io/component: ble-mqtt-bridge
+    spec:
+      # Only schedule on nodes with Bluetooth hardware
+      nodeSelector:
+        # Add label to your Raspberry Pi nodes: kubectl label node <node-name> bluetooth=true
+        bluetooth: "true"
+
+      # Use host network for Bluetooth access
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+
+      containers:
+        - name: theengs-gateway
+          image: theengs/gateway:latest
+          imagePullPolicy: Always
+
+          # Environment variables from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: theengs-gateway-config
+            - secretRef:
+                name: theengs-gateway-mqtt-credentials
+
+          # Security context for Bluetooth access
+          securityContext:
+            privileged: true
+            # Alternative: use specific capabilities instead of privileged
+            # privileged: false
+            # capabilities:
+            #   add:
+            #     - NET_ADMIN
+            #     - NET_RAW
+
+          # Volume mounts for D-Bus (BlueZ communication)
+          volumeMounts:
+            - name: dbus
+              mountPath: /var/run/dbus
+              readOnly: false
+            - name: bluetooth
+              mountPath: /var/lib/bluetooth
+              readOnly: true
+
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+          # Liveness probe - check if process is running
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - -f
+                - TheengsGateway
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+      volumes:
+        - name: dbus
+          hostPath:
+            path: /var/run/dbus
+            type: Directory
+        - name: bluetooth
+          hostPath:
+            path: /var/lib/bluetooth
+            type: DirectoryOrCreate
+
+      # Tolerate common Raspberry Pi taints
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "arm"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+      # Restart policy
+      restartPolicy: Always
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 10

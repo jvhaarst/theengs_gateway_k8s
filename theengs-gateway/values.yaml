@@ -1,0 +1,111 @@
+# Default values for theengs-gateway
+
+# Namespace configuration
+namespace:
+  create: true
+  name: theengs
+
+# Image configuration
+image:
+  repository: theengs/gateway
+  tag: latest
+  pullPolicy: Always
+
+# Node selector - only schedule on nodes with Bluetooth
+nodeSelector:
+  bluetooth: "true"
+
+# Tolerations for scheduling
+tolerations:
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: "Exists"
+    effect: "NoSchedule"
+  - key: "arm"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+# Resource limits and requests
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+# Update strategy for DaemonSet
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+
+# Security context
+securityContext:
+  privileged: true
+  # Alternative: use specific capabilities instead of privileged
+  # privileged: false
+  # capabilities:
+  #   add:
+  #     - NET_ADMIN
+  #     - NET_RAW
+
+# MQTT Configuration
+mqtt:
+  host: "mqtt.home.local"
+  port: "1883"
+  # Topics
+  publishTopic: "home/TheengsGateway/BTtoMQTT"
+  subscribeTopic: "home/TheengsGateway/commands"
+  lwtTopic: "home/TheengsGateway/LWT"
+  # Credentials - override these in your values or use external secrets
+  username: ""
+  password: ""
+  # Use existing secret for credentials
+  existingSecret: ""
+  # TLS configuration
+  tls:
+    enabled: false
+    insecure: false
+
+# BLE Scanning Configuration
+ble:
+  scanningMode: "active"
+  scanTime: "5"
+  timeBetweenScans: "5"
+  # Specify adapter, defaults to first available if empty
+  adapter: ""
+
+# Home Assistant Discovery
+discovery:
+  enabled: true
+  topic: "homeassistant/sensor"
+  deviceName: "TheengsGateway"
+  # Comma-separated list of device models to include (empty = all)
+  filter: ""
+
+# Publishing Options
+publishing:
+  publishAll: false
+  publishAdvData: false
+
+# Presence Detection
+presence:
+  enabled: false
+  topic: "home/TheengsGateway/presence"
+
+# Logging
+logLevel: "INFO"
+
+# Liveness probe configuration
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Labels to add to all resources
+commonLabels: {}
+
+# Annotations to add to pods
+podAnnotations: {}

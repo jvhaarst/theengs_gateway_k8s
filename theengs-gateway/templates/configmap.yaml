@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "theengs-gateway.fullname" . }}-config
+  namespace: {{ include "theengs-gateway.namespace" . }}
+  labels:
+    {{- include "theengs-gateway.labels" . | nindent 4 }}
+data:
+  # MQTT Broker Configuration
+  MQTT_HOST: {{ .Values.mqtt.host | quote }}
+  MQTT_PORT: {{ .Values.mqtt.port | quote }}
+
+  # MQTT Topics
+  MQTT_PUBLISH_TOPIC: {{ .Values.mqtt.publishTopic | quote }}
+  MQTT_SUBSCRIBE_TOPIC: {{ .Values.mqtt.subscribeTopic | quote }}
+  MQTT_LWT_TOPIC: {{ .Values.mqtt.lwtTopic | quote }}
+
+  # BLE Scanning Configuration
+  SCANNING_MODE: {{ .Values.ble.scanningMode | quote }}
+  BLE_SCAN_TIME: {{ .Values.ble.scanTime | quote }}
+  BLE_TIME_BETWEEN_SCANS: {{ .Values.ble.timeBetweenScans | quote }}
+  {{- if .Values.ble.adapter }}
+  ADAPTER: {{ .Values.ble.adapter | quote }}
+  {{- end }}
+
+  # Home Assistant Discovery
+  DISCOVERY: {{ ternary "1" "0" .Values.discovery.enabled | quote }}
+  DISCOVERY_TOPIC: {{ .Values.discovery.topic | quote }}
+  DISCOVERY_DEVICE_NAME: {{ .Values.discovery.deviceName | quote }}
+  {{- if .Values.discovery.filter }}
+  DISCOVERY_FILTER: {{ .Values.discovery.filter | quote }}
+  {{- end }}
+
+  # Publishing Options
+  PUBLISH_ALL: {{ ternary "1" "0" .Values.publishing.publishAll | quote }}
+  {{- if .Values.publishing.publishAdvData }}
+  PUBLISH_ADVDATA: {{ ternary "1" "0" .Values.publishing.publishAdvData | quote }}
+  {{- end }}
+
+  # Presence Detection
+  GENERAL_PRESENCE: {{ ternary "1" "0" .Values.presence.enabled | quote }}
+  {{- if .Values.presence.enabled }}
+  PRESENCE_TOPIC: {{ .Values.presence.topic | quote }}
+  {{- end }}
+
+  # Logging
+  LOG_LEVEL: {{ .Values.logLevel | quote }}
+
+  # TLS
+  {{- if .Values.mqtt.tls.enabled }}
+  ENABLE_TLS: "1"
+  TLS_INSECURE: {{ ternary "1" "0" .Values.mqtt.tls.insecure | quote }}
+  {{- end }}

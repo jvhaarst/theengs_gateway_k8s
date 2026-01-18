@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: theengs
+  labels:
+    app.kubernetes.io/name: theengs-gateway
+    app.kubernetes.io/component: ble-mqtt-bridge

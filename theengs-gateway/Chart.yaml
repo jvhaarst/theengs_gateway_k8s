@@ -1,0 +1,19 @@
+apiVersion: v2
+name: theengs-gateway
+description: A Helm chart for deploying Theengs Gateway - a BLE to MQTT bridge
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - theengs
+  - ble
+  - mqtt
+  - home-assistant
+  - bluetooth
+  - iot
+home: https://theengs.io/
+sources:
+  - https://github.com/theengs/gateway
+maintainers:
+  - name: Your Name
+    email: your-email@example.com

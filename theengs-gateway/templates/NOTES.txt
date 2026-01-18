@@ -1,0 +1,24 @@
+Theengs Gateway has been deployed!
+
+To verify the deployment, run:
+
+  kubectl get daemonset -n {{ include "theengs-gateway.namespace" . }} {{ include "theengs-gateway.fullname" . }}
+
+To check the pods:
+
+  kubectl get pods -n {{ include "theengs-gateway.namespace" . }} -l app.kubernetes.io/name={{ include "theengs-gateway.name" . }}
+
+To view logs:
+
+  kubectl logs -n {{ include "theengs-gateway.namespace" . }} -l app.kubernetes.io/name={{ include "theengs-gateway.name" . }}
+
+IMPORTANT: Make sure your Kubernetes nodes with Bluetooth hardware are labeled:
+
+  kubectl label node <node-name> bluetooth=true
+
+{{- if not (or .Values.mqtt.username .Values.mqtt.existingSecret) }}
+
+WARNING: No MQTT credentials configured. If your MQTT broker requires authentication,
+set mqtt.username and mqtt.password in your values, or use mqtt.existingSecret to
+reference an existing Kubernetes secret.
+{{- end }}

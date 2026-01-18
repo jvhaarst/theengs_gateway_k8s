@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:theengs.github.io)",
+      "WebFetch(domain:hub.docker.com)",
+      "WebFetch(domain:gateway.theengs.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(helm lint:*)",
+      "Bash(helm template:*)",
+      "mcp__kubernetes-mcp-server__nodes_top",
+      "mcp__kubernetes-mcp-server__resources_list",
+      "Bash(tree:*)"
+    ]
+  }
+}
