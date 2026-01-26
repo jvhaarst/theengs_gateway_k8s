@@ -71,9 +71,9 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pgrep
-                - -f
-                - TheengsGateway
+                - sh
+                - -c
+                - "pidof python || pidof python3"
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
