@@ -13,6 +13,15 @@ Theengs Gateway scans for BLE devices (temperature sensors, plant monitors, etc.
 - MQTT broker accessible from the cluster
 - `kubectl` configured to access your cluster
 
+## Helm Repository
+
+This chart is available via a Helm repository hosted on GitHub Pages:
+
+```bash
+helm repo add theengs https://jvhaarst.github.io/theengs_gateway_k8s
+helm repo update
+```
+
 ## Installation
 
 ### Step 1: Label Bluetooth Nodes
@@ -45,9 +54,15 @@ Choose either Kustomize or Helm:
 
 #### Option B: Helm
 
-1. Install with custom values:
+1. Add the Helm repository (if not already added):
    ```bash
-   helm install theengs-gateway ./theengs-gateway \
+   helm repo add theengs https://jvhaarst.github.io/theengs_gateway_k8s
+   helm repo update
+   ```
+
+2. Install with custom values:
+   ```bash
+   helm install theengs-gateway theengs/theengs-gateway \
      --namespace theengs \
      --create-namespace \
      --set mqtt.host=mqtt.example.com \
@@ -69,7 +84,7 @@ Choose either Kustomize or Helm:
 
    Then install:
    ```bash
-   helm install theengs-gateway ./theengs-gateway \
+   helm install theengs-gateway theengs/theengs-gateway \
      --namespace theengs \
      --create-namespace \
      -f values-override.yaml
