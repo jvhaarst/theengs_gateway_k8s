@@ -2,8 +2,8 @@ apiVersion: v2
 name: theengs-gateway
 description: A Helm chart for deploying Theengs Gateway - a BLE to MQTT bridge
 type: application
-version: 0.1.1
-appVersion: "1.0.0"
+version: 0.1.2
+appVersion: "1.5.0.4"
 keywords:
   - theengs
   - ble
