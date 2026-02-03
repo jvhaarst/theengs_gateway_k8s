@@ -79,6 +79,9 @@ ble:
 discovery:
   enabled: true
   topic: "homeassistant/sensor"
+  # Use the Kubernetes node name as device name (recommended for DaemonSets)
+  useNodeNameAsDeviceName: true
+  # Fallback device name when useNodeNameAsDeviceName is false
   deviceName: "TheengsGateway"
   # Comma-separated list of device models to include (empty = all)
   filter: ""

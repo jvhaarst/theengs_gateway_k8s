@@ -49,6 +49,15 @@ spec:
                 name: {{ include "theengs-gateway.secretName" . }}
             {{- end }}
 
+          {{- if .Values.discovery.useNodeNameAsDeviceName }}
+          # Set device name to node name using Downward API
+          env:
+            - name: DISCOVERY_DEVICE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          {{- end }}
+
           # Security context for Bluetooth access
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}

@@ -26,7 +26,9 @@ data:
   # Home Assistant Discovery
   DISCOVERY: {{ ternary "1" "0" .Values.discovery.enabled | quote }}
   DISCOVERY_TOPIC: {{ .Values.discovery.topic | quote }}
+  {{- if not .Values.discovery.useNodeNameAsDeviceName }}
   DISCOVERY_DEVICE_NAME: {{ .Values.discovery.deviceName | quote }}
+  {{- end }}
   {{- if .Values.discovery.filter }}
   DISCOVERY_FILTER: {{ .Values.discovery.filter | quote }}
   {{- end }}
