@@ -40,7 +40,10 @@ jobs:
       - name: Package Helm chart
         run: |
           mkdir -p .helm-release
-          helm package theengs-gateway -d .helm-release
+          BASE_VERSION=$(grep '^version:' theengs-gateway/Chart.yaml | awk '{print $2}')
+          NEW_VERSION="${BASE_VERSION%.*}.${{ github.run_number }}"
+          echo "Publishing chart version $NEW_VERSION"
+          helm package theengs-gateway -d .helm-release --version "$NEW_VERSION"
 
       - name: Download existing index (if exists)
         continue-on-error: true
