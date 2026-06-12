@@ -3,7 +3,7 @@ name: theengs-gateway
 description: A Helm chart for deploying Theengs Gateway - a BLE to MQTT bridge
 type: application
 version: 0.1.4
-appVersion: "v1.7.0.1"
+appVersion: "v1.7.5.1"
 keywords:
   - theengs
   - ble
