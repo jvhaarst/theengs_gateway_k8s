@@ -6,7 +6,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^theengs-gateway/Chart\\.yaml$"],
+      "fileMatch": [
+        "^theengs-gateway/Chart\\.yaml$"
+      ],
       "matchStrings": [
         "appVersion:\\s*\"(?<currentValue>v?[\\d.]+)\""
       ],
@@ -16,7 +18,20 @@
   ],
   "packageRules": [
     {
-      "matchDepNames": ["theengs/gateway"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "matchDepNames": [
+        "theengs/gateway"
+      ],
       "groupName": "theengs-gateway"
     }
   ]
