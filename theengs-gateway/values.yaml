@@ -8,7 +8,7 @@ namespace:
 # Image configuration
 image:
   repository: theengs/gateway
-  tag: v1.8.0.1
+  tag: v1.8.0.2
   pullPolicy: IfNotPresent
 
 # Node selector - only schedule on nodes with Bluetooth
