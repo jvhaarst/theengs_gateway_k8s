@@ -2,8 +2,6 @@ name: Lint Helm Chart
 
 on:
   pull_request:
-    paths:
-      - 'theengs-gateway/**'
   workflow_dispatch:
 
 permissions:
